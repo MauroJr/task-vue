@@ -7,36 +7,44 @@
   <title>Task Vue</title>
 </head>
 <body>
-  <form action="">
-    <label for="task">Task</label>
-    <input type="text" name="task">
-    <label for="description">Description</label>
-    <textarea name="description" cols="30" rows="10"></textarea>
-    <label for="status">Status</label>
-    <select name="status">
-      <option value="backlog" selected>Backlog</option>
-      <option value="todo">Todo</option>
-      <option value="doing">Doing</option>
-      <option value="done">Done</option>
-    </select>
-  </form>
-  <table style="width:100%">
-      <tr>
-        <th>Task</th>
-        <th>Description</th>
-        <th>Status</th>
-      </tr>
-      <tr>
-        <td>Seila</td>
-        <td>ainda nao tem nada</td>
-        <td>Backlog</td>
-      </tr>
-      <tr>
-        <td>Seila2</td>
-        <td>ainda nao tem nada2</td>
-        <td>Backlog</td>
-      </tr>
+  <div id="app">
+    <form @submit.prevent="addTask">
+      <div v-for="field in fields">
+        <label :for="field.name">{{ firstUpper(field.name) }}</label>
+        <input v-if="field.type === 'string'" type="text" :name="field.name">
+        <textarea v-if="field.type === 'text'" type="text" :name="field.name" cols="30" rows="10">
+        </textarea>
+        <select v-if="field.type === 'enum'" :name="field.name">
+            <option
+              v-for="(item, index) in field.items"
+              :value="item"
+              :selected="index === 0"
+              >
+              {{firstUpper(item)}}
+            </option>
+          </select>
+      </div>
+      <input type="submit" value="ADD">
+    </form>
+    <table style="width:100%">
+      <thead>
+        <tr>
+          <th v-for="column in fieldsNames">
+            {{ firstUpper(column) }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="task in tasks">
+          <td v-for="field in fieldsNames">
+            {{ task[field] }}
+          </td>
+        </tr>
+      </tbody>
     </table>
-    <script src="./app.js" ></script>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <script src="./app.js" ></script>
 </body>
 </html>

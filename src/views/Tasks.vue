@@ -155,18 +155,18 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Task' : 'Edit Task'
+      return this.editedIndex === -1 ? 'New Task' : 'Edit Task';
     }
   },
 
   watch: {
     dialog(val) {
-      val || this.close()
+      val || this.close();
     }
   },
 
   created() {
-    this.initialize()
+    this.initialize();
   },
 
   methods: {
@@ -197,31 +197,31 @@ export default {
     },
 
     editItem (item) {
-      this.editedIndex = this.tasks.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialog = true
+      this.editedIndex = this.tasks.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialog = true;
     },
 
     deleteItem (item) {
-      const index = this.tasks.indexOf(item)
-      confirm('Are you sure you want to delete this task?') && this.tasks.splice(index, 1)
+      const index = this.tasks.indexOf(item);
+      confirm('Are you sure you want to delete this task?') && this.tasks.splice(index, 1);
     },
 
     close () {
-      this.dialog = false
+      this.dialog = false;
       setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      }, 300)
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      }, 300);
     },
 
     save () {
       if (this.editedIndex > -1) {
-        Object.assign(this.tasks[this.editedIndex], this.editedItem)
+        Object.assign(this.tasks[this.editedIndex], this.editedItem);
       } else {
-        this.tasks.push(this.editedItem)
+        this.tasks.push(this.editedItem);
       }
-      this.close()
+      this.close();
     }
   }
 }

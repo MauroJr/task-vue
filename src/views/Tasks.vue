@@ -22,18 +22,18 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm12 md12>
-                  <v-text-field v-model="editedItem.name" label="Name"></v-text-field>
+                  <v-text-field v-model="$store.state.editedTask.name" label="Name"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12>
-                  <v-textarea v-model="editedItem.description" label="Description"></v-textarea>
+                  <v-textarea v-model="$store.state.editedTask.description" label="Description"></v-textarea>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field type="number" v-model="editedItem.duration" label="Duration"></v-text-field>
+                  <v-text-field type="number" v-model="$store.state.editedTask.duration" label="Duration"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md8>
                   <v-select
-                    v-model="editedItem.status"
-                    :items="statusOptions"
+                    v-model="$store.state.editedTask.status"
+                    :items="$store.state.tasksStatus"
                     item-text="Status"
                     item-value="status"
                     label="Status"
@@ -56,7 +56,7 @@
   
     <v-data-table
       :headers="headers"
-      :items="tasks"
+      :items="$store.state.tasks"
       :search="search"
       hide-actions
       class="elevation-1"
@@ -71,20 +71,20 @@
           <v-icon
             small
             class="mr-2"
-            @click="editItem(props.item)"
+            @click="editTask(props.item)"
           >
             edit
           </v-icon>
           <v-icon
             small
-            @click="deleteItem(props.item)"
+            @click="deleteTask(props.item)"
           >
             delete
           </v-icon>
         </td>
       </template>
       <template slot="no-data">
-        <v-btn color="primary" @click="initialize">Reset</v-btn>
+        <p>não tem nada aqui...</p>
       </template>
     </v-data-table>
   </v-card>
@@ -96,66 +96,13 @@ export default {
   data() {
     return {
       dialog: false,
-      search: '',
-      headers: [
-        {
-          text: 'Id',
-          align: 'left',
-          sortable: false,
-          value: 'id'
-        },
-        {
-          text: 'Name',
-          align: 'left',
-          value: 'name'
-        },
-        {
-          text: 'Description',
-          align: 'left',
-          value: 'description'
-        },
-        {
-          text: 'Duration',
-          align: 'left',
-          value: 'duration'
-        },
-        {
-          text: 'Status',
-          align: 'left',
-          value: 'status'
-        },
-        {
-          text: 'Actions',
-          value: 'name',
-          sortable: false
-        }
-      ],
-      statusOptions: [
-        'Backlog',
-        'ToDo',
-        'Doing',
-        'Done'
-      ],
-      tasks: [],
-      editedIndex: -1,
-      editedItem: {
-        name: '',
-        description: '',
-        duration: 0,
-        status: 'Backlog'
-      },
-      defaultItem: {
-        name: '',
-        description: '',
-        duration: 0,
-        status: 'Backlog'
-      }
+      search: ''
     };
   },
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Task' : 'Edit Task';
+      return this.$store.state.editedTaskIndex === -1 ? 'New Task' : 'Edit Task';
     }
   },
 
@@ -166,61 +113,61 @@ export default {
   },
 
   created() {
-    this.initialize();
+    this.headers = [
+      {
+        text: 'Id',
+        align: 'left',
+        sortable: false,
+        value: 'id'
+      },
+      {
+        text: 'Name',
+        align: 'left',
+        value: 'name'
+      },
+      {
+        text: 'Description',
+        align: 'left',
+        value: 'description'
+      },
+      {
+        text: 'Duration',
+        align: 'left',
+        value: 'duration'
+      },
+      {
+        text: 'Status',
+        align: 'left',
+        value: 'status'
+      },
+      {
+        text: 'Actions',
+        value: 'name',
+        sortable: false
+      }
+    ];
   },
 
   methods: {
-    initialize () {
-      this.tasks = [
-        {
-          id: 1,
-          name: 'task1',
-          description: 'test1 description',
-          duration: 2,
-          status: 'Backlog'
-        },
-        {
-          id: 2,
-          name: 'task2',
-          description: 'test2 description',
-          duration: 2,
-          status: 'Backlog'
-        },
-        {
-          id: 3,
-          name: 'task3',
-          description: 'test3 description',
-          duration: 2,
-          status: 'Backlog'
-        },
-      ]
-    },
 
-    editItem (item) {
-      this.editedIndex = this.tasks.indexOf(item);
-      this.editedItem = Object.assign({}, item);
+    editTask(task) {
+      this.$store.dispatch('editTask', task);
       this.dialog = true;
     },
 
-    deleteItem (item) {
-      const index = this.tasks.indexOf(item);
-      confirm('Are you sure you want to delete this task?') && this.tasks.splice(index, 1);
+    deleteTask(task) {
+      var index = this.$store.state.tasks.indexOf(task);
+      confirm('Are you sure you want to delete this task?') &&
+        this.$store.dispatch('deleteTask', index);
     },
 
     close () {
       this.dialog = false;
-      setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      }, 300);
+      this.$store.dispatch('resetEditedTask');
     },
 
-    save () {
-      if (this.editedIndex > -1) {
-        Object.assign(this.tasks[this.editedIndex], this.editedItem);
-      } else {
-        this.tasks.push(this.editedItem);
-      }
+    async save() {
+      await this.$store.dispatch('saveTask');
       this.close();
     }
   }
